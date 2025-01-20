@@ -20,6 +20,10 @@ use yii\web\UploadedFile;
 class Worklist extends \yii\db\ActiveRecord
 {
     /**
+     * @var mixed|null
+     */
+
+    /**
      * {@inheritdoc}
      */
     public static function tableName()
@@ -33,9 +37,11 @@ class Worklist extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['work_id','dep_id', 'status'], 'integer'],
+            [['file'], 'required'],
+            [['file'], 'file', 'extensions' => ['pdf'], 'maxSize' => 4194304],
+            [['work_id', 'dep_id', 'status'], 'integer'],
             [['file'], 'string', 'max' => 255],
-            [['commet'], 'string', 'max' => 255],
+            [['commet','mistake_name'], 'string', 'max' => 255],
             [['work_id'], 'exist', 'skipOnError' => true, 'targetClass' => Work::class, 'targetAttribute' => ['work_id' => 'id']],
         ];
     }
@@ -48,14 +54,15 @@ class Worklist extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'work_id' => 'Kamchilik ID',
+            'mistake_name' => 'Kamchilik nomi',
             'file' => 'File',
             'commet' => 'Commet',
             'status' => 'Status',
         ];
     }
+
     public function upload($id)
     {
-        if ($this->validate()) {
             $file = UploadedFile::getInstance($this, 'file');
             if ($file !== null) {
                 $filePath = 'uploads/depbartaraf/' . $id . '.' . $file->extension;
@@ -64,7 +71,6 @@ class Worklist extends \yii\db\ActiveRecord
                     return true;
                 }
             }
-        }
         return false;
     }
 

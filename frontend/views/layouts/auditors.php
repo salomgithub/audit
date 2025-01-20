@@ -1,105 +1,62 @@
 <?php
 
 /** @var \yii\web\View $this */
+
 /** @var string $content */
 
 use common\widgets\Alert;
-use frontend\assets\AppAsset;
+use frontend\assets\AppAsset3;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\ButtonDropdown;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
-AppAsset::register($this);
+AppAsset3::register($this);
 
 // Menu elementlari ro'yxati
 
-$menuItems = [
+$tekshiruv = [
     [
-        'label' => '<i class="menu-icon tf-icons bx bx-receipt"></i> Umumiy',
-        'url' => ['/dashboard/index'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'dashboard', // Bu qatorni qo'shing
-    ],
-    [
-        'label' => '<i class="menu-icon tf-icons bx bx-task"></i> Natijalar',
+        'label' => '<i class="menu-icon tf-icons bx bx-task"></i> Натижалар',
         'url' => ['/work/index'],
         'encode' => false,
-        'active' => Yii::$app->controller->id == 'work', // Bu qatorni qo'shing
+        'active' => Yii::$app->controller->id == 'work',
     ],
     [
-        'label' => '<i class="menu-icon tf-icons bx bx-dock-top"></i> Bartaraf qilish',
-        'url' => ['/worklist/list'],
+        'label' => '<i class="menu-icon tf-icons bx bx-task"></i> Камчилик киритиш',
+        'url' => ['/work/create'],
         'encode' => false,
-        'active' => Yii::$app->controller->id == 'worklist' && Yii::$app->controller->action->id == 'list', // Bu qatorni qo'shing
+        'active' => Yii::$app->controller->id == 'work',
     ],
-    [
-        'label' => '<i class="mmenu-icon tf-icons bx bx-layer"></i> Bartaraf qilinganlar tarixi',
-        'url' => ['/worklist/index'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'worklist' && Yii::$app->controller->action->id == 'index', // Bu qatorni qo'shing
-    ],
-    [
-        'label' => '<i class="menu-icon tf-icons bx bx-check"></i> Farmoyishlar',
-        'url' => ['/orders/index'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'orders', // Bu qatorni qo'shing
-    ],
-    [
-        'label' => '<i class="menu-icon tf-icons bx bx-cube"></i> Kamchiliklar',
-        'url' => ['/mistakes/index'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'mistakes', // Bu qatorni qo'shing
-    ],
-    [
-        'label' => '<i class="menu-icon tf-icons bx bx-collection"></i> Departament',
-        'url' => ['/departaments/index'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'departaments', // Bu qatorni qo'shing
-    ],
-    // Boshqa menularni ham qo'shing va ularga mos holatni qo'shing
 ];
-$menuHelp = [
+$hisobot = [
     [
-        'label' => '<i class="menu-icon tf-icons bx bx-error-alt"></i> Kamchiliklar',
-        'url' => ['/mistakes/index'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'dashboard', // Bu qatorni qo'shing
-    ],
-    [
-        'label' => '<i class="menu-icon tf-icons bx bx-layout"></i> Departamentlar',
-        'url' => ['/departaments/index'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'work', // Bu qatorni qo'shing
-    ],
-    [
-        'label' => '<i class="menu-icon tf-icons bx bx-lock"></i> Foydalanuvchilar',
-        'url' => ['/admin/user'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'worklist' && Yii::$app->controller->action->id == 'list', // Bu qatorni qo'shing
-    ],
-    [
-        'label' => '<i class="menu-icon tf-icons bx bx-lock"></i> Foydalanuvchi qoshish',
-        'url' => ['/admin/user/signup'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'worklist' && Yii::$app->controller->action->id == 'list', // Bu qatorni qo'shing
-    ],
-    [
-        'label' => '<i class="menu-icon tf-icons bx bx-dock-top"></i> Filiallar',
-        'url' => ['/branches/index'],
-        'encode' => false,
-        'active' => Yii::$app->controller->id == 'worklist' && Yii::$app->controller->action->id == 'index', // Bu qatorni qo'shing
-    ],
-    [
-        'label' => '<i class="menu-icon tf-icons bx bx-box"></i> Farmoyishlar',
+        'label' => '<i class="menu-icon tf-icons bx bx-box"></i> Фармойишлар',
         'url' => ['/orders/index'],
         'encode' => false,
-        'active' => Yii::$app->controller->id == 'orders', // Bu qatorni qo'shing
+        'active' => Yii::$app->controller->id == 'orders',
     ],
+    [
+        'label' => '<i class="menu-icon tf-icons bx bx-receipt"></i> AKT',
+        'url' => ['/akt/index'],
+        'encode' => false,
+        'active' => Yii::$app->controller->id == 'akt',
+    ],
+    [
+        'label' => '<i class="menu-icon tf-icons bx bx-lock"></i> Кунлик бажарилган ишлар',
+        'url' => ['/kunlik/index'],
+        'encode' => false,
+        'active' => Yii::$app->controller->id == 'worklist' && Yii::$app->controller->action->id == 'list',
+    ],
+    [
+        'label' => '<i class="menu-icon tf-icons bx bx-error-alt"></i> Давомат кунма-кун',
+        'url' => ['/davomat/auditor'],
+        'encode' => false,
+        'active' => Yii::$app->controller->id == 'davomat',
+    ],
+];
 
-    // Boshqa menularni ham qo'shing va ularga mos holatni qo'shing
-];
 ?>
 <?php $this->beginPage() ?>
     <!DOCTYPE html>
@@ -111,85 +68,113 @@ $menuHelp = [
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
     </head>
-    <body class="d-flex flex-column h-100" >
+    <body class="d-flex flex-column h-100">
     <?php $this->beginBody() ?>
+    <header id="header" class="header fixed-top d-flex align-items-center ">
+
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="#" class="logo d-flex align-items-center">
+                <?= Html::img('/img/xb-gold.png', ['alt' => 'Logo', 'width' => '155', 'height' => '285']) ?>
+                <span class="d-none d-lg-block"></span>
+            </a>
+            <i class="bi bi-list toggle-sidebar-btn"></i>
+        </div><!-- End Logo -->
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+                <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <img src="/main/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+                    <span class="d-none d-md-block dropdown-toggle ps-2"><?= Yii::$app->user->identity->username ?></span>
+                </a><!-- End Profile Iamge Icon -->
+
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                    <li class="dropdown-header">
+                        <h6><?= Yii::$app->user->identity->username ?></h6>
+                        <span>Audit Hodimi</span>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="/site/change_password">
+                            <i class="bi bi-gear"></i>
+                            <span> Парол ўзгартириш</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="#">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <?php
+                            if (Yii::$app->user->isGuest) {
+                                echo Html::tag('div', Html::a('Login', ['/site/login'], ['class' => ['btn btn-link login text-decoration-none']]), ['class' => ['d-flex']]);
+                            } else {
+                                echo Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
+                                    . Html::submitButton(
+                                        'Logout (' . Yii::$app->user->identity->username . ')',
+                                        ['class' => 'btn btn-link logout text-decoration-none']
+                                    )
+                                    . Html::endForm();
+                            }
+                            ?>
+                        </a>
+                    </li>
+
+                </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+    <aside id="sidebar" class="sidebar">
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li class="nav-item">
+                <?= Html::a('<i class="bi bi-grid"></i>Дашбоард', '/dashboard/dashboard', ['class' => 'nav-link']) ?>
+            </li><!-- End Dashboard Nav -->
+            <li class="nav-item">
+                <a class="nav-link <?= in_array(Yii::$app->controller->id, ['work', 'worklist', 'permission']) ? '' : 'collapsed' ?>"
+                   data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-menu-button-wide"></i><span>Aудит Текшируви натижалари</span><i
+                            class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="components-nav"
+                    class="nav-content collapse <?= in_array(Yii::$app->controller->id, ['work', 'worklist', 'permission']) ? 'show' : '' ?>"
+                    data-bs-parent="#sidebar-nav">
+                    <?php foreach ($tekshiruv as $item): ?>
+                        <li class="nav-item">
+                            <?= Html::a($item['label'], $item['url'], ['class' => 'nav-link']) ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </li><!-- Audit Tekshiruvi natijalari -->
+            <li class="nav-item">
+                <a class="nav-link  <?= in_array(Yii::$app->controller->id, ['dashboard','kpi', 'akt', 'davomat', 'kunlik', 'orders']) ? '' : 'collapsed' ?> "
+                   data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-layout-text-window-reverse"></i><span>Ҳисоботлар</span><i
+                            class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="tables-nav"
+                    class="nav-content collapse <?= in_array(Yii::$app->controller->id, ['dashboard','kpi', 'akt', 'davomat', 'kunlik', 'orders',]) ? 'show' : '' ?>"
+                    data-bs-parent="#sidebar-nav">
+                    <?php foreach ($hisobot as $item): ?>
+                        <li class="nav-item">
+                            <?= Html::a($item['label'], $item['url'], ['class' => 'nav-link']) ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </li><!-- Hisobotlar -->
+
+        </ul>
+
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
 
 
+        <?= $content ?>
 
-    <div class="">
-        <header>
-            <?php
-            NavBar::begin([
-                'brandLabel' => Html::img('/img/xb-gold.png', ['alt' => 'Logo', 'width' => '155', 'height' => '35']),
-                'brandUrl' => Yii::$app->homeUrl,
-                'options' => [
-                    'class' => 'navbar navbar-expand-md navbar-dark bg-dark ',
-                ],
-            ]);
-            ?>
-
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-md-9 text-end">
-                        <?php
-                        if (!Yii::$app->user->isGuest) {
-                            echo ButtonDropdown::widget([
-                                'label' => 'Yordamchi stol',
-                                'options' => ['class' => 'btn btn-secondary'],
-                                'dropdown' => [
-                                    'items' => $menuHelp,
-                                ],
-                            ]);
-                        }
-                        ?>
-                    </div>
-
-                    <div class="col-md-3 text-end">
-                        <?php
-                        if (Yii::$app->user->isGuest) {
-                            echo Html::tag('div',Html::a('Login',['/site/login'],['class' => ['btn btn-link login text-decoration-none']]),['class' => ['d-flex']]);
-                        } else {
-                            echo Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
-                                . Html::submitButton(
-                                    'Logout (' . Yii::$app->user->identity->username . ')',
-                                    ['class' => 'btn btn-link logout text-decoration-none']
-                                )
-                                . Html::endForm();
-                        }
-                        ?>
-                    </div>
-                </div>
-            </div>
-
-            <?php
-            NavBar::end();
-            ?>
-
-        </header>
-        <div class="row">
-            <aside class="col-md-2 " style="box-shadow: 0 0 15px rgba(0, 0, 0, 0.9);">
-                <nav>
-                    <ul class="nav flex-column">
-                        <?php foreach ($menuItems as $item): ?>
-                            <li class="nav-item" >
-                                <?= Html::a($item['label'], $item['url'], ['class' => 'nav-link']) ?>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </nav>
-            </aside>
-            <main role="main" class="col-md-10">
-                <div class="">
-                    <?= Breadcrumbs::widget([
-                        'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-                    ]) ?>
-                    <?= Alert::widget() ?>
-                    <?= $content ?>
-                </div>
-            </main>
-        </div>
-    </div>
-
+    </main><!-- End #main -->
 
 
     <?php $this->endBody() ?>

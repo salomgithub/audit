@@ -2,6 +2,7 @@
 
 namespace app\models\data;
 
+use app\models\TekDavBartaraf;
 use Yii;
 use yii\web\UploadedFile;
 
@@ -13,6 +14,7 @@ use yii\web\UploadedFile;
  * @property int $branch_id
  * @property int $user_id
  * @property string $file
+ * @property string created_at
  *
  * @property TekDavBartaraf[] $tekDavBartarafs
  * @property TekdanKeyinBartaraf[] $tekdanKeyinBartarafs
@@ -37,6 +39,7 @@ class Orders extends \yii\db\ActiveRecord
             [['code', 'region_id', 'branch_id'], 'integer'],
             [['file'], 'string', 'max' => 255],
             [['code'], 'unique'],
+            [['created_at'], 'safe'],
         ];
     }
 
@@ -46,11 +49,12 @@ class Orders extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'code' => 'Farmoyish nomeri',
-            'region_id' => 'Viloyat',
-            'branch_id' => 'Filial',
+            'code' => 'Фармойиш номери',
+            'region_id' => 'Вилоят',
+            'branch_id' => 'Филиал',
+            'created_at' => 'Сана',
 //            'user_id' => 'User ID',
-            'file' => 'Farmoyish fayli',
+            'file' => 'Фармойиш файли',
         ];
     }
     public function upload($id)
@@ -58,7 +62,7 @@ class Orders extends \yii\db\ActiveRecord
         if ($this->validate()) {
             $file = UploadedFile::getInstance($this, 'file');
             if ($file !== null) {
-                $filePath = 'uploads/' . $id . '.' . $file->extension;
+                $filePath = 'uploads/farmoyish/' . $id . '.' . $file->extension;
                 if ($file->saveAs($filePath)) {
                     $this->file = $filePath;
                     return true;
@@ -66,26 +70,6 @@ class Orders extends \yii\db\ActiveRecord
             }
         }
         return false;
-    }
-
-    /**
-     * Gets query for [[TekDavBartarafs]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTekDavBartarafs()
-    {
-        return $this->hasMany(TekDavBartaraf::class, ['farmoish_id' => 'code']);
-    }
-
-    /**
-     * Gets query for [[TekdanKeyinBartarafs]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTekdanKeyinBartarafs()
-    {
-        return $this->hasMany(TekdanKeyinBartaraf::class, ['farmoyish_id' => 'code']);
     }
 
 

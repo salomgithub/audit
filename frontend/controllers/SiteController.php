@@ -3,6 +3,9 @@
 namespace frontend\controllers;
 
 use app\models\AuthAssignment;
+use app\models\data\Departaments;
+use app\models\Work;
+use common\models\User;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -22,12 +25,14 @@ use frontend\models\ContactForm;
  */
 class SiteController extends Controller
 {
-    public $layout = 'login';
+//    public $layout = 'login';
     /**
      * {@inheritdoc}
      */
     public function behaviors()
     {
+
+
         return [
             'access' => [
                 'class' => AccessControl::class,
@@ -54,9 +59,38 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function init()
+    {
+        parent::init();
+
+        if (!Yii::$app->user->isGuest) {
+            $user_id = Yii::$app->user->id;
+            $role = AuthAssignment::findOne(['user_id' => $user_id]);
+            if ($role !== null) {
+                $role = $role->item_name ? $role->item_name : 0;
+                if ($role === 'Administrator') {
+                    $this->layout = 'main';
+                }
+                if ($role === 'admin_audit') {
+                    $this->layout = 'main';
+                }
+                if ($role === 'auditor') {
+                    $this->layout = 'auditors';
+                }
+                if ($role === 'departaments') {
+                    $this->layout = 'departaments';
+                }
+                if ($role === 'monitoring') {
+                    $this->layout = 'main';
+                }
+            } else {
+                Yii::$app->session->setFlash('error', 'Роль пользователя не определена.');
+                Yii::$app->user->logout();
+//                return $this->redirect(['/site/login']);
+            }
+        }
+    }
+
     public function actions()
     {
         return [
@@ -70,47 +104,53 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     * Displays homepage.
-     *
-     * @return mixed
-     */
     public function actionIndex()
     {
-        return $this->render('index');
+        $user_id = Yii::$app->user->id;
+        $dep_id = \common\models\User::findOne($user_id)->dep_id;
+        $dep_name = Departaments::findOne($dep_id)->name;
+        return $this->render('index', [
+            'dep_name' => $dep_name,
+        ]);
     }
 
-    /**
-     * Logs in a user.
-     *
-     * @return mixed
-     */
     public function actionLogin()
     {
+        $this->layout = 'login';
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-//            return $this->goBack();
             $user_id = Yii::$app->user->id;
             $role = AuthAssignment::findOne(['user_id' => $user_id]);
-            $role = $role->item_name;
-            if ($role === 'Administrator') {
-                return $this->render('/dashboard/index');
-            }
-            if ($role === 'admin_audit') {
-                return $this->render('/dashboard/index');
-            }
-            if ($role === 'auditor') {
-                return $this->render('/work/index');
-            }
-            if ($role === 'departaments') {
-                return $this->render('/worklist/list');
-            }
-            if ($role === 'monitoring') {
-                return $this->render('/dashboard/index');
+
+            if ($role !== null) {
+                $role = $role->item_name;
+                if ($role === 'Administrator') {
+                    $this->layout = 'main';
+                    return $this->goBack();
+                }
+                if ($role === 'admin_audit') {
+                    $this->layout = 'main';
+                    return $this->goBack();
+                }
+                if ($role === 'auditor') {
+                    $this->layout = 'main';
+                    return $this->goBack();
+                }
+                if ($role === 'departaments') {
+                    $this->layout = 'departaments';
+                    return $this->goBack();
+                }
+                if ($role === 'monitoring') {
+                    $this->layout = 'main';
+                    return $this->goBack();
+                }
+            } else {
+                Yii::$app->session->setFlash('error', 'Роль пользователя не определена.');
+                Yii::$app->user->logout();
             }
         }
 
@@ -121,11 +161,6 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Logs out the current user.
-     *
-     * @return mixed
-     */
     public function actionLogout()
     {
         Yii::$app->user->logout();
@@ -133,44 +168,6 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
-    /**
-     * Displays contact page.
-     *
-     * @return mixed
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
-            } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
-            }
-
-            return $this->refresh();
-        }
-
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return mixed
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
-
-    /**
-     * Signs user up.
-     *
-     * @return mixed
-     */
     public function actionSignup()
     {
         $model = new SignupForm();
@@ -184,11 +181,6 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Requests password reset.
-     *
-     * @return mixed
-     */
     public function actionRequestPasswordReset()
     {
         $model = new PasswordResetRequestForm();
@@ -207,13 +199,48 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Resets password.
-     *
-     * @param string $token
-     * @return mixed
-     * @throws BadRequestHttpException
-     */
+    public function actionChange_password()
+    {
+        $user = Yii::$app->user->identity;
+        $loadedPost = $user->load(Yii::$app->request->post());
+        if ($loadedPost && $user->validate()) {
+            $user->password = $user->newPassword;
+            $user->save(false);
+            Yii::$app->session->setFlash('success', 'pasword changed ok');
+            return $this->actionLogout();
+        }
+        return $this->render("change_password", [
+            'user' => $user,
+        ]);
+    }
+
+    public function actionUsers_list()
+    {
+        $users = User::find()->all();
+
+        return $this->render("users_list", [
+            'users' => $users,
+        ]);
+    }
+
+    public function actionReset_password()
+    {
+        $user_id = Yii::$app->request->post('User')['id']; // предположим, что у вас есть поле 'id' в модели User
+        $user = User::findOne($user_id);
+
+        $loadedPost = $user->load(Yii::$app->request->post());
+        if ($loadedPost && $user !== null) {
+            $user->password = $user->newPassword;
+            $user->save(false);
+            Yii::$app->session->setFlash('success', 'pasword changed ok');
+            return $this->redirect(['site/users_list']);
+        }
+
+        return $this->render("users_list", [
+            'user' => $user,
+        ]);
+    }
+
     public function actionResetPassword($token)
     {
         try {
@@ -233,13 +260,6 @@ class SiteController extends Controller
         ]);
     }
 
-    /**
-     * Verify email address
-     *
-     * @param string $token
-     * @return yii\web\Response
-     * @throws BadRequestHttpException
-     */
     public function actionVerifyEmail($token)
     {
         try {
@@ -256,11 +276,6 @@ class SiteController extends Controller
         return $this->goHome();
     }
 
-    /**
-     * Resend verification email
-     *
-     * @return mixed
-     */
     public function actionResendVerificationEmail()
     {
         $model = new ResendVerificationEmailForm();

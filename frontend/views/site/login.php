@@ -2,6 +2,7 @@
 
 /** @var yii\web\View $this */
 /** @var yii\bootstrap5\ActiveForm $form */
+
 /** @var \common\models\LoginForm $model */
 
 use yii\bootstrap5\Html;
@@ -11,31 +12,37 @@ $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>Please fill out the following fields to login:</p>
 
     <div class="row">
-        <div class="col-lg-5">
-            <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-                <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+        <section
+                class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div style="background-color: hsla(0,0%,100%,.9); padding: 5px 20px 50px 5px"
+                         class="col-lg-3 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
-                <?= $form->field($model, 'password')->passwordInput() ?>
+                        <div class="d-flex justify-content-center py-4">
+                            <?= Html::img('/img/xb-gold.png', ['alt' => 'Logo', 'width' => '255', 'height' => '80']) ?>
 
-                <?= $form->field($model, 'rememberMe')->checkbox() ?>
+                        </div><h2 align="center" style="color: darkred">ATMT </h2>
+                        <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-                <div class="my-1 mx-0" style="color:#999;">
-                    If you forgot your password you can <?= Html::a('reset it', ['site/request-password-reset']) ?>.
-                    <br>
-                    Need new verification email? <?= Html::a('Resend', ['site/resend-verification-email']) ?>
+                        <?= $form->field($model, 'username')->textInput(['autofocus' => true])->label('Логин') ?>
+
+                        <?= $form->field($model, 'password')->passwordInput()->label('Пароль') ?>
+
+
+                        <div class="form-group" align="right">
+                            <?= Html::submitButton('Войти', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                        </div>
+
+                        <?php ActiveForm::end(); ?>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-                </div>
-
-            <?php ActiveForm::end(); ?>
-        </div>
+            </div>
     </div>
 </div>
+</div>
+<!---->

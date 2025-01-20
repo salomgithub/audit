@@ -11,7 +11,7 @@ use yii\widgets\ActiveForm;
 <div class="worklist-search">
 
     <?php $form = ActiveForm::begin([
-        'action' => ['index'],
+        'action' => ['list'],
         'method' => 'get',
     ]); ?>
 

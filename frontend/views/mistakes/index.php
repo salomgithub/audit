@@ -2,6 +2,7 @@
 
 use app\models\data\Mistakes;
 use yii\bootstrap5\LinkPager;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
@@ -22,18 +23,52 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Mistakes', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
+            [
+                'attribute' => 'head_mistakes_group_code',
+                'filter' => ArrayHelper::map(\app\models\data\HeadMistakesGroup::find()->all(), 'code', 'name'),
+                'value' => function ($model) {
+                    $id = $model->head_mistakes_group_code;
+                    $name = \app\models\data\HeadMistakesGroup::findOne($id);
+                    return $name->name;
+                },
+            ],
             'code',
             'name',
-            'quantity',
-            'status',
+//            'quantity',
+            [
+                'attribute' => 'quantity',
+                'filter' => ArrayHelper::map(\app\models\data\Quantity::find()->all(), 'id', 'name'),
+                'value' => function ($model) {
+                    $id = $model->quantity;
+                    $name = \app\models\data\Quantity::findOne($id);
+                    return $name->name;
+                },
+            ],
+            [
+                'attribute' => 'status',
+                'filter' => ArrayHelper::map(\app\models\data\Status::find()->all(), 'id', 'name'),
+                'value' => function ($model) {
+                    $id = $model->status;
+                    $name = \app\models\data\Status::findOne($id);
+                    return $name->name;
+                },
+            ],
+            [
+                'attribute' => 'uzlashtirish',
+                'filter' => ['0' => '-', '1' => 'uzlashtirish'],
+                'value' => function ($model) {
+                    $name = $model->uzlashtirish;
+                    if ($name === 1) $name = 'uzlashtirish';
+                    else $name = '';
+                    return $name;
+                },
+            ],
+//            'status',
             'create_at',
             //'head_mistakes_group_code',
             //'mistakes_group_code',

@@ -10,7 +10,7 @@ use yii\grid\GridView;
 /** @var app\models\data\OrdersSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Farmoyishlar';
+$this->title = 'Фармойишлар';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="orders-index">
@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Yangi farmoyish qo\'shish', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Янги фармойиш қўшиш', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -30,8 +30,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'code',
-//            'name',
-//            'region_id',
             [
                 'attribute'=>'region_id',
                 'filter'=>\yii\helpers\ArrayHelper::map(\app\models\data\Regions::find()->all(),'id','name'),
@@ -40,22 +38,22 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $region_name->name; // region nomini chiqarish
                 },
             ],
-//            'branch_id',
             [
                 'attribute'=>'branch_id',
                 'filter'=>\yii\helpers\ArrayHelper::map(\app\models\data\Branches::find()->all(),'id','name'),
                 'value' => function ($model) {
-                    if (isset($model->branch_id)){
-                        $branch_name = \app\models\data\Branches::findOne($model->branch_id);
-                        $branch_name = $branch_name->name;
+                    $branch_name = "viloyat filiallari"; // Default qiymat
+                    if ($model->branch_id !== null) {
+                        $branch = \app\models\data\Branches::findOne($model->branch_id);
+                        if ($branch !== null) {
+                            $branch_name = $branch->name;
+                        }
                     }
-                    else $branch_name = "viloyat filiallari";
                     return $branch_name; // branch nomini chiqarish
                 },
             ],
 
-//            'user_id',
-//            'file',
+            'created_at',
             [
                 'attribute'=>'Fayl',
                 'format' => 'raw',

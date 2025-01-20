@@ -15,6 +15,10 @@ return [
 //    'defaultRoute' => 'work/index',
     'controllerNamespace' => 'frontend\controllers',
     'modules' => [
+        'gridview' => [
+            'class' => 'kartik\grid\Module',
+            // other module configurations, if needed
+        ],
         'admin' => [
             'class' => 'mdm\admin\Module',
             'layout' => 'left-menu',
@@ -50,18 +54,22 @@ return [
             'errorAction' => 'site/error',
         ],
 
-        /*
+
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                '' => 'site/index',
+                '<controller:\w+>/<action:\w+>/' => '<controller>/<action>',
+                'test/saveimage' => 'test/saveimage',
             ],
         ],
-        */
+
     ],
     'as access' => [
         'class' => 'mdm\admin\components\AccessControl',
         'allowActions' => [
+//            'site/index',
             'site/login',
             'site/logout',
 //            '*',

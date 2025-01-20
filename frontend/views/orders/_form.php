@@ -10,6 +10,7 @@ use yii\widgets\ActiveForm;
 /** @var yii\web\View $this */
 /** @var app\models\data\Orders $model */
 /** @var yii\widgets\ActiveForm $form */
+$regions = Regions::find()->all();
 ?>
 
 <div class="orders-form">
@@ -18,43 +19,24 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'code')->textInput() ?>
 
-    <?php
-    $regions = Regions::find()->all();
-    $regionItems = ArrayHelper::map($regions,'id','name');
-    $regionParams = [
-        'prompt' => 'Укажите область'
-    ];
-
-    $branchs = Branches::find()->all();
-    $branchItems = ArrayHelper::map($branchs,'id','name');
-    $branchParams = [
-        'prompt' => 'Укажите МФО'
-    ];
-
-
-    ?>
-
-
-
-
-    <?= $form->field($model, 'region_id', ['inputOptions'=>['class' =>'form-control', 'tabindex'=>'1']])->dropDownList(ArrayHelper::map(Regions::find()->all(),'id','name'),
+    <?= $form->field($model, 'region_id', ['inputOptions'=>['class' =>'form-control', 'tabindex'=>'2']])->dropDownList(ArrayHelper::map($regions,'id','name'),
         [
-            'prompt'  => '....',
+            'prompt'  => 'Укажите область',
             'onchange'=> '
-                $.post( "index.php?r=orders%2Flistbranches&id='.'"+$(this).val(), function (data){
-                $("select#orders-branch_id").html(data);
-            });'
+                $.post( "/my/listbranches2?id='.'"+$(this).val(), function (data){
+                $("select#orders-branch_id").html(data);});'
         ]); ?>
 
-    <?= $form->field($model, 'branch_id', ['inputOptions'=>['class' =>'form-control', 'tabindex'=>'2']])->dropDownList(ArrayHelper::map($branchs,'id','name'),
+    <?= $form->field($model, 'branch_id', ['inputOptions'=>['class' =>'form-control', 'tabindex'=>'3']])->dropDownList([],
         [
-            'prompt'  => '.......',
+            'prompt'  => 'Укажите МФО',
         ]); ?>
+
 
     <?= $form->field($model, 'file')->fileInput(['class' => 'btn btn-primary']) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Сақлаш', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Delete', ['delete', 'code' => $model->code], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Ҳақиқатан ҳам бу элементни ўчириб ташламоқчимисиз?',
                 'method' => 'post',
             ],
         ]) ?>
@@ -31,9 +31,9 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'code',
 //            'name',
-            'region_id',
+//            'region_id',
             [
-                'attribute' => 'Viloyat',
+                'attribute' => 'Вилоят',
                 // 'format' => 'raw',
                 'value' => function(){
 

@@ -6,9 +6,11 @@ use app\models\data\Branches;
 use app\models\data\BranchesSearch;
 use app\models\data\HeadMistakesGroup;
 use app\models\data\Mistakes;
+use app\models\data\MistakesGroup;
 use app\models\data\Orders;
 use app\models\data\Regions;
 use app\models\data\Status;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -35,6 +37,23 @@ class MyController extends Controller
         }
 
     }
+    public function actionListbranchesfromorders($id)
+    {
+        $id = Orders::findOne($id)->region_id;
+        $branches = Branches::find()->where(['region_id'=>$id])->all();
+        $branchesCounts = Branches::find()->where(['region_id'=>$id])->count();
+
+
+        if ($branchesCounts>0) {
+            echo "<option value=''>.....</option>";
+            foreach ($branches as $branch) {
+                echo "<option value='".$branch->id."'>".$branch->name."</option>";
+            }
+        } else {
+            echo "<option>-</option>";
+        }
+
+    }
 
     public function actionListbranches($id)
     {
@@ -44,9 +63,44 @@ class MyController extends Controller
 
 
         if ($branchesCounts>0) {
-//            echo "<option value=''>.....</option>";
+            echo "<option value=''>.....</option>";
             foreach ($branches as $branch) {
                 echo "<option value='".$branch->id."'>".$branch->name."</option>";
+            }
+        } else {
+            echo "<option>-</option>";
+        }
+
+    }
+    public function actionListbranches2($id)
+    {
+//        $region_id = Orders::findOne($id);
+        $branches = Branches::find()->where(['region_id'=>$id])->all();
+        $branchesCounts = Branches::find()->where(['region_id'=>$id])->count();
+
+
+        if ($branchesCounts>0) {
+            echo "<option value=''>.....</option>";
+            foreach ($branches as $branch) {
+                echo "<option value='".$branch->id."'>".$branch->name."</option>";
+            }
+        } else {
+            echo "<option>-</option>";
+        }
+
+    }
+
+    public function actionListmistakesfromgroup($id)
+    {
+
+        $groups = MistakesGroup::find()->where(['head_mistakes_group_code'=>$id])->all();
+        $group_count = MistakesGroup::find()->where(['head_mistakes_group_code'=>$id])->count();
+
+
+        if ($group_count>0) {
+            echo "<option value=''>.....</option>";
+            foreach ($groups as $group) {
+                echo "<option value='".$group->code."'>".$group->name."</option>";
             }
         } else {
             echo "<option>-</option>";
@@ -58,16 +112,27 @@ class MyController extends Controller
     {
         $mistakes = Mistakes::find()->where(['head_mistakes_group_code'=>$id])->all();
         $mistakesCounts = Mistakes::find()->where(['head_mistakes_group_code'=>$id])->count();
-
         if ($mistakesCounts>0) {
-            echo "<option value=''></option>";
             foreach ($mistakes as $misktake) {
                 echo "<option value='".$misktake->code."'>".$misktake->name."</option>";
             }
         } else {
             echo "<option>-</option>";
         }
+    }
 
+    public function actionListgroupmistakes($id)
+    {
+        echo "<script>console.log(ss)</script>";
+        $mistakes = Mistakes::find()->where(['mistakes_group_code'=>$id])->all();
+        $mistakesCounts = Mistakes::find()->where(['mistakes_group_code'=>$id])->count();
+        if ($mistakesCounts>0) {
+            foreach ($mistakes as $misktake) {
+                echo "<option value='".$misktake->code."'>".$misktake->name."</option>";
+            }
+        } else {
+            echo "<option>-</option>";
+        }
     }
 
     public function actionListmistakes($id)
@@ -76,6 +141,13 @@ class MyController extends Controller
         $status = Status::findOne($mistakes->status);
 
         echo "<option value='".$status->id."'>".$status->name."</option>";
+
+    }
+    public function actionListqiymat($id)
+    {
+        $mistakes = Mistakes::findOne($id);
+
+        echo $mistakes->quantity;
 
     }
     public function actionStatus($id)

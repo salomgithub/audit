@@ -2,11 +2,13 @@
 
 namespace frontend\controllers;
 
+use app\models\AuthAssignment;
 use app\models\data\Branches;
 use app\models\data\BranchesSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use Yii;
 
 /**
  * BranchesController implements the CRUD actions for Branches model.
@@ -18,6 +20,26 @@ class BranchesController extends Controller
      */
     public function behaviors()
     {
+        if (!Yii::$app->user->isGuest) {
+            $user_id = Yii::$app->user->id;
+            $role = AuthAssignment::findOne(['user_id' => $user_id]);
+            $role = $role->item_name ? $role->item_name : 0;
+            if ($role === 'Administrator') {
+                $this->layout = 'main';
+            }
+            if ($role === 'admin_audit') {
+                $this->layout = 'main';
+            }
+            if ($role === 'auditor') {
+                $this->layout = 'auditors';
+            }
+            if ($role === 'departaments') {
+                $this->layout = 'departaments';
+            }
+            if ($role === 'monitoring') {
+                $this->layout = 'main';
+            }
+        }
         return array_merge(
             parent::behaviors(),
             [
@@ -31,11 +53,6 @@ class BranchesController extends Controller
         );
     }
 
-    /**
-     * Lists all Branches models.
-     *
-     * @return string
-     */
     public function actionIndex()
     {
         $searchModel = new BranchesSearch();
@@ -47,12 +64,20 @@ class BranchesController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single Branches model.
-     * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+    public function actionMail()
+    {
+        $result = Yii::$app->mailer->compose()
+            ->setFrom('test@ingo.uz')
+            ->setTo('s.yuldashev@ingo.uz')
+            ->setSubject('ok subject')
+            ->setTextBody('ok text body')
+            ->setHtmlBody('ok HTML')
+            ->send();
+        var_dump($result);
+        die();
+    }
+
+
     public function actionView($id)
     {
         return $this->render('view', [
@@ -60,11 +85,6 @@ class BranchesController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Branches model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
-     */
     public function actionCreate()
     {
         $model = new Branches();
@@ -82,13 +102,6 @@ class BranchesController extends Controller
         ]);
     }
 
-    /**
-     * Updates an existing Branches model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
@@ -102,13 +115,6 @@ class BranchesController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing Branches model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
@@ -116,13 +122,6 @@ class BranchesController extends Controller
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the Branches model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Branches the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($id)
     {
         if (($model = Branches::findOne(['id' => $id])) !== null) {

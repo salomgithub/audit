@@ -21,6 +21,7 @@ use Yii;
  * @property int $branch_id
  * @property string $year
  * @property int $unical кредитдан ташқари ҳолларда уникалка
+ * @property int $hisob_raqam hisob raqam
  * @property string $client_name
  * @property int $head_mistakes_group_code
  * @property int $mistake_code
@@ -41,121 +42,85 @@ use Yii;
  */
 class Work extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
+
     public static function tableName()
     {
         return 'work';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
-            [['farmoyish_id', 'region_id', 'branch_id', 'year', 'unical', 'client_name', 'head_mistakes_group_code', 'mistake_code', 'status', 'mistake_soni','bartaraf_soni', 'mistake_sum', 'mistak_from_user', 'departament_id'], 'required'],
-            [['farmoyish_id', 'region_id', 'branch_id', 'unical', 'head_mistakes_group_code', 'mistake_code', 'mistake_soni','bartaraf_soni', 'user_id','bartaraf_sum', 'departament_id'], 'integer'],
-            [['year', 'mistake_sum', 'work_status'], 'safe'],
-//            [['mistake_sum'], 'number'],
-            [['client_name'], 'string', 'max' => 100],
-            [['mistak_from_user', 'comment'], 'string', 'max' => 255],
+            [['farmoyish_id', 'region_id', 'branch_id', 'year',  'client_name', 'head_mistakes_group_code', 'mistake_code', 'status', 'mistake_soni','bartaraf_soni', 'mistak_from_user', 'departament_id'], 'required'],
+            [['farmoyish_id', 'region_id', 'branch_id', 'head_mistakes_group_code', 'mistake_soni','bartaraf_soni', 'user_id', 'departament_id'], 'integer'],
+            [['year', 'work_status','hisob_raqam', 'unical'], 'safe'],
+            [['mistake_sum','bartaraf_sum'], 'number'],
+            [['client_name'], 'string', 'max' => 150],
+            [['mistak_from_user', 'comment'], 'string', 'max' => 1024],
             [['region_id'], 'exist', 'skipOnError' => true, 'targetClass' => Regions::class, 'targetAttribute' => ['region_id' => 'id']],
             [['branch_id'], 'exist', 'skipOnError' => true, 'targetClass' => Branches::class, 'targetAttribute' => ['branch_id' => 'id']],
             [['departament_id'], 'exist', 'skipOnError' => true, 'targetClass' => Departaments::class, 'targetAttribute' => ['departament_id' => 'id']],
-            [['mistake_code'], 'exist', 'skipOnError' => true, 'targetClass' => Mistakes::class, 'targetAttribute' => ['mistake_code' => 'code']],
             [['farmoyish_id'], 'exist', 'skipOnError' => true, 'targetClass' => Orders::class, 'targetAttribute' => ['farmoyish_id' => 'code']],
             [['head_mistakes_group_code'], 'exist', 'skipOnError' => true, 'targetClass' => HeadMistakesGroup::class, 'targetAttribute' => ['head_mistakes_group_code' => 'code']],
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
             'id' => 'ID',
-            'farmoyish_id' => 'Farmoyish ID',
-            'region_id' => 'Viloyat',
-            'branch_id' => 'Filial',
-            'year' => 'Tekshirilgan yil',
-            'unical' => 'Kredit ID',
-            'client_name' => 'Mijoz FIO',
-            'head_mistakes_group_code' => 'Kamchilik turi',
-            'mistake_code' => 'Kamchilik nomi',
-            'status' => 'holati',
-            'mistake_soni' => 'Kamchilik soni',
-            'mistake_sum' => 'Kamchilik summasi',
-            'bartaraf_soni' => 'Bartaraf soni',
-            'bartaraf_sum' => 'Bartaraf summasi',
-            'mistak_from_user' => 'Kamchilik sababchisi FIO',
-            'user_id' => 'Kamchilik aniqlagan hodim',
-            'departament_id' => 'Departament ID',
-            'comment' => 'izoh',
-            'work_status' => 'Kamchilik statusi',
+            'farmoyish_id' => 'фармойиш',
+            'region_id' => 'вилоят',
+            'branch_id' => 'филиал',
+            'year' => 'йил',
+            'unical' => 'кредит_ид',
+            'client_name' => 'мижоз',
+            'head_mistakes_group_code' => 'булинма',
+            'mistake_code' => 'камчилик',
+            'status' => 'холат',
+            'mistake_soni' => 'сон',
+            'mistake_sum' => 'сумма',
+            'bartaraf_soni' => 'бартараф_сон',
+            'bartaraf_sum' => 'бартараф_сум',
+            'mistak_from_user' => 'сабабчи',
+            'user_id' => 'текширувчи',
+            'departament_id' => 'департамент',
+            'comment' => 'изох',
+            'work_status' => 'статус',
         ];
     }
 
-    /**
-     * Gets query for [[Branch]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getBranch()
     {
         return $this->hasOne(Branches::class, ['id' => 'branch_id']);
     }
 
-    /**
-     * Gets query for [[Departament]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getDepartament()
     {
         return $this->hasOne(Departaments::class, ['id' => 'departament_id']);
     }
 
-
-    /**
-     * Gets query for [[Farmoyish]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getFarmoyish()
     {
         return $this->hasOne(Orders::class, ['code' => 'farmoyish_id']);
     }
 
-    /**
-     * Gets query for [[HeadMistakesGroupCode]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getHeadMistakesGroupCode()
     {
         return $this->hasOne(HeadMistakesGroup::class, ['code' => 'head_mistakes_group_code']);
     }
 
-    /**
-     * Gets query for [[MistakeCode]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getMistakeCode()
     {
         return $this->hasOne(Mistakes::class, ['code' => 'mistake_code']);
     }
 
-    /**
-     * Gets query for [[Region]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getRegion()
     {
         return $this->hasOne(Regions::class, ['id' => 'region_id']);
     }
+    public function getMistakes()
+    {
+        return $this->hasMany(Mistakes::className(), ['work_id' => 'id']);
+    }
+
 }

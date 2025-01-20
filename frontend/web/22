@@ -1,0 +1,12 @@
+RewriteEngine on
+RewriteBase /
+
+# Agar fayl yoki direktoriya mavjud emas bo'lsa
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Veb-saytning boshqaruv paneli
+RewriteRule ^(admin)($|/) - [L]
+
+# Yii2 yonidagi qoidalarni qo'llab-quvvatlash
+RewriteRule . index.php

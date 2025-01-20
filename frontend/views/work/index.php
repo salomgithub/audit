@@ -5,11 +5,14 @@ use app\models\data\Departaments;
 use app\models\data\HeadMistakesGroup;
 use app\models\data\Regions;
 use app\models\Work;
+use yii\bootstrap5\LinkPager;
+use yii\data\Pagination;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
 /** @var app\models\search\WorkSearch $searchModel */
@@ -18,111 +21,144 @@ use yii\grid\GridView;
 $this->title = 'Aniqlangan kamchiliklar jadvali';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<script>
+    function exportExcel() {
+        var table = document.getElementById("source-table");
+        var html = table.outerHTML;
+        var url = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(html);
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = "table.xls";
+        link.click();
+    }
+
+</script>
 <div class="work-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Kamchiliklarni kiritish', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php  echo $this->render('_search_', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-
+        'pager' => [
+            'class' => \yii\widgets\LinkPager::class,
+            'linkOptions' => ['class' => 'page-link'],
+            'options' => ['class' => 'pagination justify-content-center'],
+            'prevPageLabel' => '«',
+            'nextPageLabel' => '»',
+            'maxButtonCount' => 10,
+            'prevPageCssClass' => 'page-item',
+            'nextPageCssClass' => 'page-item',
+            'activePageCssClass' => 'active',
+            'disabledPageCssClass' => 'disabled',
+        ],
+        'tableOptions' => ['id' => 'source-table', 'class' => 'table table-striped table-bordered'],
+        'filterSelector' => 'select[name="WorkSearch[perPage]"]',
+        'options' => ['id' => 'table_id'],
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
+            [
+                'attribute' => '#',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    $work_id = $model->id;
+                    $a = "<a href='view?id=$work_id'><i class='bi bi-folder' style='font-size: 30px;'></i></a>";
+                    return $a;
+                },
+            ],
             'id',
             'farmoyish_id',
             [
-                'attribute'=>'region_id',
-                'filter'=>ArrayHelper::map(Regions::find()->all(),'id','name'),
-                'value'=>'region.name'
+                'attribute' => 'region_id',
+                'filter' => ArrayHelper::map(Regions::find()->all(), 'id', 'name'),
+                'value' => 'region.name'
             ],
             [
-                'attribute'=>'branch_id',
-                'filter'=>ArrayHelper::map(Branches::find()->all(),'id','name'),
-                'value'=>'branch.name'
+                'attribute' => 'branch_id',
+                'filter' => ArrayHelper::map(Branches::find()->all(), 'id', 'name'),
+                'value' => 'branch.name'
             ],
-//            'year',
+            'year',
 //            'unical',
-            //'client_name',
+            'client_name',
 //            'head_mistakes_group_code',
             [
-                'attribute'=>'head_mistakes_group_code',
-                'filter'=>ArrayHelper::map(HeadMistakesGroup::find()->all(),'code','name'),
-                'value'=>'headMistakesGroupCode.name'
+                'attribute' => 'head_mistakes_group_code',
+                'filter' => ArrayHelper::map(HeadMistakesGroup::find()->all(), 'code', 'name'),
+                'value' => 'headMistakesGroupCode.name'
             ],
             [
-                'attribute'=>'mistake_code',
-                'filter'=>ArrayHelper::map(\app\models\data\Mistakes::find()->all(),'code','name'),
-                'value'=>'mistakeCode.name'
+                'attribute' => 'mistake_code',
+                'filter' => ArrayHelper::map(\app\models\data\Mistakes::find()->all(), 'code', 'name'),
+                'value' => 'mistakeCode.name'
             ],
 //            'mistake_code',
-//            'mistake_soni',
+            'mistake_soni',
 //            'mistake_sum',
             //'mistak_from_user',
 //            'user_id',
             [
-                'attribute'=>'mistake_sum',
+                'attribute' => 'mistake_sum',
 //                'filter'=>ArrayHelper::map(\app\models\data\Mistakes::find()->all(),'code','name'),
-                'value'=> function($model){
+                'value' => function ($model) {
                     $soni = $model->mistake_sum;
                     $soni = number_format($soni, 0, '', ' ');
                     return $soni;
                 },
             ],
-            [
-                'attribute'=>'user_id',
-                'filter'=>ArrayHelper::map(\app\models\data\Mistakes::find()->all(),'code','name'),
-                'value'=> function($model){
-                    $username = $model->user_id;
-                    $username = \common\models\User::findOne($username);
-                    $username = $username->username;
-                    return $username;
+            'bartaraf_soni',
+            'bartaraf_sum',
 
-                },
+            [
+                'attribute' => 'departament_id',
+                'filter' => ArrayHelper::map(Departaments::find()->all(), 'id', 'name'),
+                'value' => 'departament.name'
             ],
-
-//            'departament_id',
             [
-                'attribute'=>'departament_id',
-                'filter'=>ArrayHelper::map(Departaments::find()->all(),'id','name'),
-                'value'=>'departament.name'
+                'attribute' => 'user_id',
+                'filter'=>ArrayHelper::map(\common\models\User::find()->all(),'id','fio'),
+                'value' => function ($model) {
+                    $fio = \common\models\User::findOne($model->user_id)->fio;
+                    return $fio;
+                },
             ],
 //            'work_status',
             [
-                'attribute'=>'work_status',
+                'attribute' => 'work_status',
                 'format' => 'raw',
                 'filter' => [
-                     0 => 'Yangi',
-                     1 => 'Jarayonda',
-                     2 => 'Yopilgan',
-                     3 => 'Tekshiruv vaqtida bartaraf',
+                    0 => 'Янги',
+                    1 => 'Жараёнда',
+                    2 => 'Ёпилган',
+                    3 => 'Текширув вақтида бартараф',
+                    4 => 'Рад қилинган',
                 ],
                 'value' => function ($model) {
                     $work_status = $model->work_status;
-                    if ($work_status == 0)
-                    return Html::a('Yangi','#', ['class' => 'btn btn-danger']) ;
-                    if ($work_status == 1)
-                    return Html::a('Jarayonda',['worklistview', 'work_id' => $model->id], ['class' => 'btn btn-warning']) ;
-                    if ($work_status == 3)
-                    return Html::a('Tekshiruv vaqtida bartaraf',['worklistview', 'work_id' => $model->id], ['class' => 'btn btn-info']) ;
-                    else return Html::a('Yopilgan', '#',['class' => 'btn btn-primary']) ;
+                    if ($work_status === 0)
+                        return Html::a('Янги', '#', ['class' => 'btn btn-info']);
+                    if ($work_status === 1)
+                        return Html::a('Жараёнда', '#', ['class' => 'btn btn-warning']);
+                    if ($work_status === 2)
+                        return Html::a('Ёпилган', '#', ['class' => 'btn btn-success']);
+                    if ($work_status === 3)
+                        return '<p>Текширув вақтида бартараф';
+                    if ($work_status === 4)
+                        return Html::a('Рад қилинган', ['worklistview', 'work_id' => $model->id], ['class' => 'btn btn-danger']);
                 },
             ],
 
-            //'comment',
             [
-                'class' => ActionColumn::className(),
+                'class' => ActionColumn::class,
                 'urlCreator' => function ($action, Work $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                }
             ],
         ],
     ]); ?>
+
 
 </div>
