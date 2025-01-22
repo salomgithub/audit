@@ -19,21 +19,24 @@ $regions = \app\models\data\Regions::find()->all();
     ]); ?>
 
     <div class="row">
-        <div class="col-md-3">
-            <?= $form->field($model, 'region_id', ['inputOptions'=>['class' =>'form-control', 'tabindex'=>'3']])->dropDownList(ArrayHelper::map($regions,'id','name'),
+        <div class="col-md-2">
+            <?= $form->field($model, 'region_id', ['inputOptions' => ['class' => 'form-control', 'tabindex' => '3']])->dropDownList(ArrayHelper::map($regions, 'id', 'name'),
                 [
-                    'prompt'  => '.......',
-                    'onchange'=> '
-                $.post( "/my/listbranches?id='.'"+$(this).val(), function (data){
+                    'prompt' => '.......',
+                    'onchange' => '
+                $.post( "/my/listbranches?id=' . '"+$(this).val(), function (data){
                 $("select#balancesearch-branch_id").html(data);});'
                 ]); ?>
-
-            <?= $form->field($model, 'branch_id', ['inputOptions'=>['class' =>'form-control', 'tabindex'=>'4']])->dropDownList([],
+        </div>
+        <div class="col-md-2">
+            <?= $form->field($model, 'branch_id', ['inputOptions' => ['class' => 'form-control', 'tabindex' => '4']])->dropDownList([],
                 [
-                    'prompt'  => '.......',
+                    'prompt' => '.......',
                 ]); ?>
+        </div>
+        <div class="col-md-2">
             <?= $form->field($model, 'from_data')->dropDownList($dropdownItems, [
-                'prompt' => 'Select a date range', // Add a prompt for the dropdown
+                'prompt' => 'vaqt oraligini tanlang', // Add a prompt for the dropdown
             ]) ?>
         </div>
 

@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
 
+            'branch_id',
             'hisob_raqam',
             'hisob_raqam_nomi',
             'kirim_aktiv',

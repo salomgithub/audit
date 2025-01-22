@@ -598,17 +598,42 @@ class FinanceController extends Controller
             ->asArray() // Return the results as an array
             ->all();
 
+        foreach ($data as $datum) {
+            $branches = Balance::find()
+                ->select(['branch_id', 'MIN(from_data) as from_data'])
+                ->where(['between', 'from_data', $datum['from_data'], $datum['to_data']])
+                ->groupBy(['branch_id'])
+                ->orderBy(['branch_id' => SORT_ASC])
+                ->asArray()
+                ->all();
+        }
+
+//        die();
+
+
         $dropdownItems = ArrayHelper::map($data, function ($item) {
             return $item['from_data'] . ' : ' . $item['to_data']; // Value
         }, function ($item) {
             return $item['from_data'] . ' : ' . $item['to_data']; // Label
         });
 
-        if ($from_data != null)
+        if ($from_data != null || $branch_id != null){
             list($from_data, $to_data) = explode(' : ', $from_data);
-        else echo "<script>alert('Xatolik: Nolga bo\'lish imkoniyati mavjud.');</script>";
+            $aktivlar = $this->aktivlar($branch_id, $from_data, $to_data);
+        }
+        else {
+            echo "<script>alert('Xatolik: vaqt oraligini tanlang.');</script>";
 
-        $aktivlar = $this->aktivlar($branch_id, $from_data, $to_data);
+            $default['0']['0'] = [
+                'name' => 0,
+                'summa1' =>0,
+                'foiz1' =>0,
+                'summa2' =>0,
+                'foiz2' =>0,
+                'farqi' =>0
+            ];
+            $aktivlar = $default;
+        }
 
         return $this->render('aktivlar', [
             'model' => $aktivlar,
@@ -1306,6 +1331,7 @@ class FinanceController extends Controller
 
     public function aktivlar($branch_id, $from_data, $to_data)
     {
+//        if ($from_data === null || $to_data === null ) return 0;
         $a = Balance::find()
                 ->where(['hisob_raqam' => 11100])
                 ->andFilterWhere([
