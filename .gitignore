@@ -1,5 +1,5 @@
 # yii console commands
-/yii
+#/yii
 /yii_test
 /yii_test.bat
 
@@ -18,7 +18,7 @@ nbproject
 Thumbs.db
 
 # composer vendor dir
-/vendor
+#/vendor
 
 # composer itself is not needed
 composer.phar
@@ -27,17 +27,17 @@ composer.phar
 .DS_Store
 
 # phpunit itself is not needed
-phpunit.phar
+#phpunit.phar
 # local phpunit config
-/phpunit.xml
+#/phpunit.xml
 
 # vagrant runtime
-/.vagrant
+#/.vagrant
 
 # ignore generated files
-/frontend/web/index.php
-/frontend/web/index-test.php
-/frontend/web/robots.txt
-/backend/web/index.php
-/backend/web/index-test.php
-/backend/web/robots.txt
+#/frontend/web/index.php
+#/frontend/web/index-test.php
+#/frontend/web/robots.txt
+#/backend/web/index.php
+#/backend/web/index-test.php
+#/backend/web/robots.txt

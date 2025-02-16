@@ -23,6 +23,7 @@ use yii\widgets\ActiveForm;
     </div>
     <div class="col-md-3">
         <?= $form->field($model, 'year') ?>
+        <?= $form->errorSummary($searchModel) ?>
     </div>
     <div class="col-md-3">
         <div class="form-group"><br>

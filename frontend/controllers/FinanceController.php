@@ -372,7 +372,7 @@ class FinanceController extends Controller
         return $this->render('import', [
             'model' => $model,
             'regions' => $regions,
-            ]);
+        ]);
     }
 
     public function actionImporttest()
@@ -586,51 +586,73 @@ class FinanceController extends Controller
     public function actionAktivlar()
     {
         $searchModel = new BalanceSearch();
+        $dataProvider = $searchModel->search_aktivlar($this->request->queryParams);
+
+        if (Yii::$app->request->isPost && $searchModel->load($this->request->post())) {
+
+            $dataProvider = $searchModel->search_aktivlar(Yii::$app->request->post());
+            if($dataProvider===0) {
+                $message = "nolga teng bo'lishi mumkin emas";
+                return $this->render('aktivlar_null', [
+                    'searchModel' => $searchModel
+                ]);
+            }
+            return $this->render('aktivlar', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+
+
+        return $this->render('aktivlar_null', [
+            'searchModel' => $searchModel
+        ]);
 
         $branch_id = $this->request->queryParams['BalanceSearch']['branch_id'] ?? null;
         $from_data = $this->request->queryParams['BalanceSearch']['from_data'] ?? null;
         $to_data = $this->request->queryParams['BalanceSearch']['to_data'] ?? null;
 
-        $data = Balance::find()
+        $data_for_search = Balance::find()
             ->select(['from_data', 'to_data']) // Select only the columns you want
             ->groupBy(['from_data', 'to_data']) // Group by these columns
             ->orderBy(['from_data' => SORT_ASC]) // Group by these columns
             ->asArray() // Return the results as an array
             ->all();
 
-        foreach ($data as $datum) {
+        foreach ($data_for_search as $data) {
             $branches = Balance::find()
                 ->select(['branch_id', 'MIN(from_data) as from_data'])
-                ->where(['between', 'from_data', $datum['from_data'], $datum['to_data']])
+                ->where(['between', 'from_data', $data['from_data'], $data['to_data']])
                 ->groupBy(['branch_id'])
                 ->orderBy(['branch_id' => SORT_ASC])
                 ->asArray()
                 ->all();
         }
 
-//        die();
-
-
-        $dropdownItems = ArrayHelper::map($data, function ($item) {
+        $dropdownItems = ArrayHelper::map($data_for_search, function ($item) {
             return $item['from_data'] . ' : ' . $item['to_data']; // Value
         }, function ($item) {
             return $item['from_data'] . ' : ' . $item['to_data']; // Label
         });
 
-        if ($from_data != null || $branch_id != null){
+        if ($from_data != null) {
             list($from_data, $to_data) = explode(' : ', $from_data);
+            if ($branch_id == null) {
+                $branch_id = 1;
+            }
+
             $aktivlar = $this->aktivlar($branch_id, $from_data, $to_data);
-        }
-        else {
+        } else {
+//            die("<h1>00000".$from_data);
             echo "<script>alert('Xatolik: vaqt oraligini tanlang.');</script>";
 
             $default['0']['0'] = [
                 'name' => 0,
-                'summa1' =>0,
-                'foiz1' =>0,
-                'summa2' =>0,
-                'foiz2' =>0,
-                'farqi' =>0
+                'summa1' => 0,
+                'foiz1' => 0,
+                'summa2' => 0,
+                'foiz2' => 0,
+                'farqi' => 0
             ];
             $aktivlar = $default;
         }
@@ -1735,8 +1757,7 @@ class FinanceController extends Controller
             'jami2' => $daromad_emas1 + $daromad1
         ];
         try {
-            if ($daromad === 0 || $daromad_emas === 0 || $daromad1 === 0 || $daromad_emas1 === 0)
-            {
+            if ($daromad === 0 || $daromad_emas === 0 || $daromad1 === 0 || $daromad_emas1 === 0) {
                 throw new DivisionByZeroError("Daromad va daromad emas 0 ga teng bo'lishi mumkin emas.");
                 die();
             }
@@ -1774,8 +1795,9 @@ class FinanceController extends Controller
             ];
         } catch (DivisionByZeroError $e) {
             echo "<script>alert('Xatolik: Nolga bo\'lish imkoniyati mavjud.');</script>";
-            return $this->redirect('http://audit.ingo.uz/finance/aktivlar'); die();
-        }catch (Exception $e) {
+            return $this->redirect('http://audit.ingo.uz/finance/aktivlar');
+            die();
+        } catch (Exception $e) {
             // Boshqa istisnolarni ushlash
             echo "Umumiy xato: " . $e->getMessage();
         }
